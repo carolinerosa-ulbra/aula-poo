@@ -29,15 +29,16 @@ Estacionamentos de shoppings, prédios comerciais ou universidades costumam cont
 
 ## Estrutura do projeto
 
+```
 src/main/java/br/com/sistemaEstacionamento/
-├── model/ # classes de domínio e enums
+├── model/                                     # classes de domínio e enums
 │ ├── Ticket.java
 │ ├── TipoVaga.java
 │ ├── Vaga.java
 │ └── Veiculo.java
-└── service/ # ponto de entrada da aplicação
+└── service/                                   # ponto de entrada da aplicação
 └── Main.java
-
+```
 
 ## Pacotes:
 
