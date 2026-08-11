@@ -51,10 +51,10 @@ package main.java.br.com.sistemaEstacionamento.service;  // Main
 ## Como executar
 
 Projeto Maven, aplicação de console. Após clonar o repositório:
-
+```
 mvn compile
 mvn exec:java
-
+```
 
 ## Integrantes
 
