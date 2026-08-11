@@ -27,14 +27,33 @@ Estacionamentos de shoppings, prédios comerciais ou universidades costumam cont
 - Emitir comprovante de pagamento
 - Consultar histórico de veículos
 
+## Estrutura do projeto
+
+src/main/java/br/com/sistemaEstacionamento/
+├── model/ # classes de domínio e enums
+│ ├── Ticket.java
+│ ├── TipoVaga.java
+│ ├── Vaga.java
+│ └── Veiculo.java
+└── service/ # ponto de entrada da aplicação
+└── Main.java
+
+
+## Pacotes:
+
+```java
+package main.java.br.com.sistemaEstacionamento;          // arquivos começam em /src
+package main.java.br.com.sistemaEstacionamento.model;    // classes e enums
+package main.java.br.com.sistemaEstacionamento.service;  // Main
+```
+
 ## Como executar
 
 Projeto Maven, aplicação de console. Após clonar o repositório:
 
-```
 mvn compile
 mvn exec:java
-```
+
 
 ## Integrantes
 
