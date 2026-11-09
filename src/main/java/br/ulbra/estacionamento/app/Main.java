@@ -1,11 +1,16 @@
-package br.ulbra.estacionamento;
+package br.ulbra.estacionamento.app;
+
+import br.ulbra.estacionamento.dominio.*;
+import br.ulbra.estacionamento.repositorio.*;
+import java.nio.file.Path;
 
 import java.time.LocalDateTime;
 
 public class Main {
 
     public static void main(String[] args) {
-        Estacionamento estacionamento = new Estacionamento(3);
+        RegistroRepository repositorio = new RegistroRepositoryArquivo(Path.of("registros.csv"));
+        Estacionamento estacionamento = new Estacionamento(3, repositorio);
         LocalDateTime entrada = LocalDateTime.of(2026, 10, 19, 19, 0);
 
         System.out.println("Vagas livres: " + estacionamento.vagasLivres());
@@ -22,5 +27,8 @@ public class Main {
 
         System.out.printf("Total arrecadado: R$ %.2f%n", valorCarro + valorMoto);
         System.out.println("Vagas livres no fim: " + estacionamento.vagasLivres());
+        for (RegistroCobranca registro : repositorio.listarTodos()) {
+            System.out.println(registro);
+        }
     }
 }

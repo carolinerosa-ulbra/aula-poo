@@ -1,4 +1,4 @@
-package br.ulbra.estacionamento;
+package br.ulbra.estacionamento.dominio;
 
 public abstract class Veiculo {
 

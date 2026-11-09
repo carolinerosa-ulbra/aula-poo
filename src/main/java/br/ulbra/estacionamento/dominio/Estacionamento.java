@@ -1,4 +1,8 @@
-package br.ulbra.estacionamento;
+package br.ulbra.estacionamento.dominio;
+
+import br.ulbra.estacionamento.cobranca.*;
+import br.ulbra.estacionamento.repositorio.RegistroRepository;
+import br.ulbra.estacionamento.repositorio.RegistroCobranca;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -8,9 +12,11 @@ import java.util.List;
 public class Estacionamento {
 
     private final List<Vaga> vagas = new ArrayList<>();
+    private final RegistroRepository repositorio;
 
     // COMPOSIÇÃO: as vagas nascem aqui dentro e não existem sem o estacionamento.
-    public Estacionamento(int quantidadeDeVagas) {
+    public Estacionamento(int quantidadeDeVagas, RegistroRepository repositorio) {
+        this.repositorio = repositorio;
         for (int numero = 1; numero <= quantidadeDeVagas; numero++) {
             vagas.add(new Vaga(numero));
         }
@@ -44,7 +50,10 @@ public class Estacionamento {
                 vaga.liberar();
             }
         }
-        return ticket.fechar(saida);
+        double valor = ticket.fechar(saida);
+        repositorio.salvar(new RegistroCobranca(ticket.getVeiculo().getPlaca(),
+                ticket.getVeiculo().getTipo(), ticket.getEntrada(), saida, valor));
+        return valor;
     }
 
     private Vaga buscarVagaLivre() {

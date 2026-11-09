@@ -1,4 +1,4 @@
-﻿# Sistema de Estacionamento — Encontro 11
+# Sistema de Estacionamento — Encontro 12
 
 Projeto de demonstração de Fundamentos de Programação Orientada a Objetos — ADS, ULBRA, 2026/2. O projeto Maven completo está na raiz: basta clonar este repositório.
 
@@ -17,28 +17,33 @@ Pré-requisitos: JDK 25 e Maven 3.9.x. Confira com `java -version` e `mvn -versi
 ```sh
 mvn compile
 mvn test
-java -cp target/classes br.ulbra.estacionamento.Main
+java -cp target/classes br.ulbra.estacionamento.app.Main
 ```
 
 O exemplo registra um carro e uma moto, simula 60 minutos por parâmetros e imprime R$ 6,00 + R$ 3,60 = R$ 9,60. Não depende de espera nem do relógio real.
 
 ## Estrutura e conceitos
 
-Todas as classes estão em `src/main/java/br/ulbra/estacionamento`; os testes estão no caminho equivalente em `src/test/java`.
+Os pacotes ficam em `src/main/java/br/ulbra/estacionamento`; os testes seguem os mesmos pacotes em `src/test/java`.
 
-`Veiculo` é abstrata; `Carro` e `Moto` especializam o tipo. `PoliticaDeCobranca` possui duas implementações. `Estacionamento.escolherPolitica` decide qual usar, `Ticket` guarda a referência e `Ticket.fechar` executa a cobrança polimórfica.
+| Pacote | Responsabilidade |
+|---|---|
+| `dominio` | Veículos, ticket, vagas e estacionamento |
+| `cobranca` | Interface e políticas de cobrança |
+| `repositorio` | Record `RegistroCobranca`, contrato e armazenamento em memória ou CSV |
+| `app` | Cenário executável em `Main` |
 
-O estacionamento cria suas vagas (composição). O construtor e os métodos de alteração de `Vaga` têm acesso de pacote; `getVagas()` expõe uma lista não modificável.
+`Vaga` e `Estacionamento` permanecem juntos para manter o acesso de pacote. O estacionamento recebe um `RegistroRepository` e grava cada cobrança na saída. O `Main` escolhe o arquivo `registros.csv` e lista o histórico; executar novamente acrescenta registros ao mesmo arquivo. O CSV usa `;`, datas ISO e valor decimal com ponto. Os testes usam memória e diretórios temporários, sem alterar o arquivo da aplicação.
 
-Nesta etapa, os erros são provisórios: `IllegalStateException` para lotação e `IllegalArgumentException` para tipo sem política. As próximas aulas introduzem persistência e exceções próprias.
+O polimorfismo continua nos pontos de decisão (`escolherPolitica`), armazenamento (`Ticket`) e execução (`fechar`). Os erros de lotação e tipo ainda são provisórios; falhas de arquivo são convertidas em `UncheckedIOException`, preservando a causa. A próxima aula separa o serviço do domínio e apresenta exceções próprias.
 
 ## Como o código evolui
 
 - `v11`: pacote único, herança, interface, polimorfismo, composição e testes.
-- `v12` (próxima etapa): pacotes por responsabilidade e repositórios em memória e CSV.
+- `v12`: pacotes por responsabilidade e repositórios em memória e CSV.
 - `v13` (próxima etapa): exceções próprias, serviço e menu de console.
 
-Após a publicação das tags, use `git checkout v11` para estudar esta aula e `git checkout main` para voltar à principal. Enquanto a atualização estiver em revisão, `git checkout atualizacao-aulas-11-a-13` retorna à branch de trabalho.
+Após a publicação das tags, use `git checkout v12` para estudar esta aula e `git checkout main` para voltar à principal. Enquanto a atualização estiver em revisão, `git checkout atualizacao-aulas-11-a-13` retorna à branch de trabalho.
 
 ## Uso de IA
 

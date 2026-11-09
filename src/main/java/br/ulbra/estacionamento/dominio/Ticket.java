@@ -1,4 +1,6 @@
-package br.ulbra.estacionamento;
+package br.ulbra.estacionamento.dominio;
+
+import br.ulbra.estacionamento.cobranca.*;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;

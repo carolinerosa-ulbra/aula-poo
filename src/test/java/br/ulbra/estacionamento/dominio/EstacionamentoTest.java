@@ -1,4 +1,8 @@
-package br.ulbra.estacionamento;
+package br.ulbra.estacionamento.dominio;
+
+import br.ulbra.estacionamento.cobranca.*;
+import br.ulbra.estacionamento.repositorio.RegistroRepository;
+import br.ulbra.estacionamento.repositorio.RegistroRepositoryEmMemoria;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -13,10 +17,12 @@ class EstacionamentoTest {
     private static final LocalDateTime ENTRADA = LocalDateTime.of(2026, 10, 19, 19, 0);
 
     private Estacionamento estacionamento;
+    private RegistroRepository repositorio;
 
     @BeforeEach
     void preparar() {
-        estacionamento = new Estacionamento(2);
+        repositorio = new RegistroRepositoryEmMemoria();
+        estacionamento = new Estacionamento(2, repositorio);
     }
 
     @Test
@@ -57,4 +63,13 @@ class EstacionamentoTest {
                 () -> estacionamento.getVagas().clear());
         assertTrue(estacionamento.getVagas().size() > 0);
     }
-}
+    @Test
+    void saidaDeveSalvarORegistro() {
+        Ticket ticket = estacionamento.registrarEntrada(new Carro("ABC1D23"), ENTRADA);
+
+        estacionamento.registrarSaida(ticket, ENTRADA.plusMinutes(60));
+
+        assertEquals(1, repositorio.listarTodos().size());
+        assertEquals("ABC1D23", repositorio.listarTodos().getFirst().placa());
+        assertEquals(6.0, repositorio.listarTodos().getFirst().valor(), 0.001);
+    }}

@@ -1,4 +1,4 @@
-package br.ulbra.estacionamento;
+package br.ulbra.estacionamento.cobranca;
 
 public interface PoliticaDeCobranca {
 

@@ -1,4 +1,4 @@
-package br.ulbra.estacionamento;
+package br.ulbra.estacionamento.cobranca;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
