@@ -1,4 +1,4 @@
-package br.ulbra.estacionamento.repositorio;
+package br.ulbra.estacionamento.dominio;
 
 import java.time.LocalDateTime;
 

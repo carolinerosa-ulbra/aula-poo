@@ -1,31 +1,35 @@
 package br.ulbra.estacionamento.dominio;
 
-import br.ulbra.estacionamento.cobranca.*;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import br.ulbra.estacionamento.cobranca.CobrancaCarro;
+import br.ulbra.estacionamento.cobranca.CobrancaMoto;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.Test;
 
 class TicketTest {
 
-    private static final LocalDateTime ENTRADA = LocalDateTime.of(2026, 10, 19, 19, 0);
+    private static final LocalDateTime ENTRADA = LocalDateTime.of(2026, 11, 9, 19, 0);
 
     @Test
     void deveCobrarSegundoAPoliticaRecebida() {
         Ticket ticket = new Ticket(new Carro("ABC1D23"), new CobrancaCarro(), ENTRADA);
 
-        double valor = ticket.fechar(ENTRADA.plusMinutes(60));
-
-        assertEquals(6.00, valor, 0.001);
+        assertEquals(6.00, ticket.fechar(ENTRADA.plusMinutes(60)), 0.001);
     }
 
     @Test
     void mesmoTicketComPoliticaDiferenteDeveCobrarDiferente() {
         Ticket ticket = new Ticket(new Moto("XYZ9K88"), new CobrancaMoto(), ENTRADA);
 
-        double valor = ticket.fechar(ENTRADA.plusMinutes(60));
+        assertEquals(3.60, ticket.fechar(ENTRADA.plusMinutes(60)), 0.001);
+    }
 
-        assertEquals(3.60, valor, 0.001);
+    @Test
+    void deveRecusarSaidaAnteriorAEntrada() {
+        Ticket ticket = new Ticket(new Carro("ABC1D23"), new CobrancaCarro(), ENTRADA);
+
+        assertThrows(PeriodoInvalidoException.class, () -> ticket.fechar(ENTRADA.minusMinutes(1)));
     }
 }

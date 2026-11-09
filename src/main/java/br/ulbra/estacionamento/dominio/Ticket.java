@@ -1,7 +1,6 @@
 package br.ulbra.estacionamento.dominio;
 
-import br.ulbra.estacionamento.cobranca.*;
-
+import br.ulbra.estacionamento.cobranca.PoliticaDeCobranca;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
@@ -13,14 +12,16 @@ public class Ticket {
 
     public Ticket(Veiculo veiculo, PoliticaDeCobranca politica, LocalDateTime entrada) {
         this.veiculo = veiculo;
-        this.politica = politica;   // ponto de ARMAZENAMENTO: só uma referência
+        this.politica = politica; // ponto de ARMAZENAMENTO: referência à interface
         this.entrada = entrada;
     }
 
-    // A saída entra por parâmetro para o método ser testável (sem depender do relógio).
     public double fechar(LocalDateTime saida) {
+        if (saida.isBefore(entrada)) {
+            throw new PeriodoInvalidoException();
+        }
         long minutos = ChronoUnit.MINUTES.between(entrada, saida);
-        return politica.calcularValor(minutos);   // ponto de EXECUÇÃO
+        return politica.calcularValor(minutos); // ponto de EXECUÇÃO do polimorfismo
     }
 
     public Veiculo getVeiculo() {

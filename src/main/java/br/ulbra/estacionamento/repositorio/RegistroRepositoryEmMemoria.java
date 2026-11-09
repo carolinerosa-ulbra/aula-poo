@@ -1,6 +1,6 @@
 package br.ulbra.estacionamento.repositorio;
 
-
+import br.ulbra.estacionamento.dominio.RegistroCobranca;
 import java.util.ArrayList;
 import java.util.List;
 

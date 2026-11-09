@@ -1,12 +1,12 @@
 package br.ulbra.estacionamento.repositorio;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-
-
-
+import br.ulbra.estacionamento.dominio.RegistroCobranca;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.Test;
@@ -40,4 +40,12 @@ class RegistroRepositoryArquivoTest {
         assertEquals(3.6, segundo.listarTodos().get(1).valor(), 0.001);
     }
 
+    @Test
+    void arquivoCorrompidoDeveLancarErroTecnico() throws IOException {
+        Path arquivo = pasta.resolve("registros.csv");
+        Files.writeString(arquivo, "linha;quebrada" + System.lineSeparator());
+        RegistroRepository repositorio = new RegistroRepositoryArquivo(arquivo);
+
+        assertThrows(RepositorioException.class, repositorio::listarTodos);
+    }
 }

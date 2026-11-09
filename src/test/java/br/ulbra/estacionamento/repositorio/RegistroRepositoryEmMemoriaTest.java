@@ -3,6 +3,7 @@ package br.ulbra.estacionamento.repositorio;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import br.ulbra.estacionamento.dominio.RegistroCobranca;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.Test;
 
