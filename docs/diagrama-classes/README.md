@@ -1,6 +1,6 @@
 # Diagramas — estado v13
 
-Os diagramas abaixo representam o código atual. A imagem `diagrama.png` foi preservada como material anterior; sua alteração local não faz parte da atualização dos encontros 11 a 13.
+Os diagramas Mermaid abaixo representam o código atual (v13). A [imagem fornecida pela professora](diagrama.png) ilustra o núcleo do Encontro 11: composição das vagas, veículos e políticas de cobrança. Ela foi incluída em um commit complementar, após as tags das aulas.
 
 ## Classes
 

@@ -4,7 +4,7 @@
 
 A branch `main`, em `adf2454`, continha um modelo inicial anterior ao Encontro 11: `Main`, `Veiculo`, `Ticket`, `TipoVaga`, uma `Vaga` de domínio e um record `Vaga` vazio. Os pacotes começavam incorretamente por `main.java.br.com.sistemaEstacionamento`. Não havia `pom.xml`, testes ou tags. Não havia `PortariaEstacionamento` nem `CobrancaCarga`.
 
-Havia uma alteração local em `docs/diagrama-classes/diagrama.png`, preservada sem inclusão nos commits. Os materiais locais foram usados como referência e ignorados pelo Git; os alunos recebem todo o projeto pela raiz do repositório.
+Havia uma alteração local em `docs/diagrama-classes/diagrama.png`, inicialmente preservada fora dos três commits das aulas. Após autorização da professora, a imagem foi incluída em um commit complementar, sem mover as tags. Os materiais locais foram usados como referência e ignorados pelo Git; os alunos recebem todo o projeto pela raiz do repositório.
 
 ## Commits, tags e validação
 
@@ -42,7 +42,7 @@ A busca por `import br.ulbra.estacionamento.repositorio` em `src/main/java/br/ul
 | Record `Vaga` vazio no pacote da aplicação | Removido por não ter comportamento nem equivalente no design da referência |
 | `Main` com espera e montagem manual das vagas | Substituído pelo cenário do v11/v12 e, no v13, pela raiz de composição com menu |
 
-O modelo antigo permanece no histórico anterior a `v11`. Nenhuma classe antiga foi mantida em paralelo como código morto. A imagem modificada pela professora foi preservada byte a byte e continua fora dos commits desta atualização.
+O modelo antigo permanece no histórico anterior a `v11`. Nenhuma classe antiga foi mantida em paralelo como código morto. A imagem modificada pela professora foi preservada byte a byte e incluída no commit complementar `Inclua o diagrama fornecido pela professora`. Esse commit altera apenas a imagem e a documentação; os testes executados nos estados das aulas continuam sendo os registrados acima.
 
 ## Pontos para a professora avaliar
 
