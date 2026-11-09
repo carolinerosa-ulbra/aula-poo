@@ -1,64 +1,45 @@
-# Sistema de Estacionamento (Projeto de Demonstração)
+﻿# Sistema de Estacionamento — Encontro 11
 
-> Projeto de demonstração usado pela professora na disciplina de Fundamentos de Programação Orientada a Objetos — ADS — ULBRA — 2026/2. Não é um dos domínios disponíveis para os estudantes.
+Projeto de demonstração de Fundamentos de Programação Orientada a Objetos — ADS, ULBRA, 2026/2. O projeto Maven completo está na raiz: basta clonar este repositório.
 
-## Domínio
+## Regras de negócio
 
-Sistema de controle de entrada, saída e cobrança de veículos em um estacionamento.
+- RN1: o valor cobrado depende do tipo do veículo.
+- RN2: carro paga R$ 0,10 por minuto.
+- RN3: moto paga R$ 0,06 por minuto.
+- RN4: a entrada ocupa uma vaga livre; sem vaga, a entrada é recusada.
+- RN5: a saída libera a vaga e usa a política escolhida na entrada.
 
-## Problema
+## Compilar, testar e executar
 
-Estacionamentos de shoppings, prédios comerciais ou universidades costumam controlar vagas e cobranças manualmente, com papel ou planilha — gerando erros de cobrança, filas na saída e dificuldade de saber, em tempo real, quantas vagas estão livres.
+Pré-requisitos: JDK 25 e Maven 3.9.x. Confira com `java -version` e `mvn -version`.
 
-## Usuários
-
-- Operador do estacionamento
-- Motorista / cliente
-- Gerente do estabelecimento
-
-## Funcionalidades iniciais
-
-- Registrar entrada de veículo
-- Registrar saída e calcular valor a pagar
-- Consultar vagas disponíveis
-- Cadastrar tipos de vaga
-- Aplicar tabela de preços por período
-- Cadastrar mensalistas com desconto
-- Emitir comprovante de pagamento
-- Consultar histórico de veículos
-
-## Estrutura do projeto
-
-src/main/java/br/com/sistemaEstacionamento/
-├── model/ # classes de domínio e enums
-│ ├── Ticket.java
-│ ├── TipoVaga.java
-│ ├── Vaga.java
-│ └── Veiculo.java
-└── service/ # ponto de entrada da aplicação
-└── Main.java
-
-
-## Pacotes:
-
-```java
-package main.java.br.com.sistemaEstacionamento;          // arquivos começam em /src
-package main.java.br.com.sistemaEstacionamento.model;    // classes e enums
-package main.java.br.com.sistemaEstacionamento.service;  // Main
+```sh
+mvn compile
+mvn test
+java -cp target/classes br.ulbra.estacionamento.Main
 ```
 
-## Como executar
+O exemplo registra um carro e uma moto, simula 60 minutos por parâmetros e imprime R$ 6,00 + R$ 3,60 = R$ 9,60. Não depende de espera nem do relógio real.
 
-Projeto Maven, aplicação de console. Após clonar o repositório:
+## Estrutura e conceitos
 
-mvn compile
-mvn exec:java
+Todas as classes estão em `src/main/java/br/ulbra/estacionamento`; os testes estão no caminho equivalente em `src/test/java`.
 
+`Veiculo` é abstrata; `Carro` e `Moto` especializam o tipo. `PoliticaDeCobranca` possui duas implementações. `Estacionamento.escolherPolitica` decide qual usar, `Ticket` guarda a referência e `Ticket.fechar` executa a cobrança polimórfica.
 
-## Integrantes
+O estacionamento cria suas vagas (composição). O construtor e os métodos de alteração de `Vaga` têm acesso de pacote; `getVagas()` expõe uma lista não modificável.
 
-Prof. Caroline Pacheco da Rosa (demonstração)
+Nesta etapa, os erros são provisórios: `IllegalStateException` para lotação e `IllegalArgumentException` para tipo sem política. As próximas aulas introduzem persistência e exceções próprias.
 
-## Uso de IA nesta entrega
+## Como o código evolui
 
-Sim. Ferramenta: Claude. Partes em que foi usada: revisão do formato das histórias de usuário e sugestão de critério de priorização do backlog. O que foi feito sem apoio de IA: escolha do domínio, definição do problema/usuários e decisão de prioridades.
+- `v11`: pacote único, herança, interface, polimorfismo, composição e testes.
+- `v12` (próxima etapa): pacotes por responsabilidade e repositórios em memória e CSV.
+- `v13` (próxima etapa): exceções próprias, serviço e menu de console.
+
+Após a publicação das tags, use `git checkout v11` para estudar esta aula e `git checkout main` para voltar à principal. Enquanto a atualização estiver em revisão, `git checkout atualizacao-aulas-11-a-13` retorna à branch de trabalho.
+
+## Uso de IA
+
+Codex foi usado para organizar a evolução dos encontros 11 a 13, adaptar os materiais fornecidos, atualizar a documentação e executar as verificações. A definição do domínio e dos materiais de referência é da professora.
