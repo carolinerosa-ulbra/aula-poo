@@ -1,0 +1,14 @@
+target/
+registros.csv
+.idea/
+.vscode/
+*.iml
+.classpath
+.project
+.settings/
+*.class
+
+# Materiais locais da professora; os alunos usam o projeto na raiz.
+/estacionamento-live-encontro11/
+/estacionamento-v13-referencia/
+/estacionamento-v13-referencia.zip
