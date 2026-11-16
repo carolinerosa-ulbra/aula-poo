@@ -43,10 +43,11 @@ public class ServicoDeEstacionamento {
         if (ticket == null) {
             throw new TicketNaoEncontradoException(placa);
         }
-        double valor = estacionamento.registrarSaida(ticket, saida);
+        double valor = estacionamento.calcularValorDaSaida(ticket, saida);
         RegistroCobranca registro = new RegistroCobranca(chave, ticket.getVeiculo().getTipo(),
                 ticket.getEntrada(), saida, valor);
         repositorio.salvar(registro);
+        estacionamento.liberarVaga(ticket);
         ticketsAbertos.remove(chave);
         return registro;
     }

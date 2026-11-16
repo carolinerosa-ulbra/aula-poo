@@ -10,6 +10,7 @@ import br.ulbra.estacionamento.dominio.TicketNaoEncontradoException;
 import br.ulbra.estacionamento.dominio.TipoDeVeiculoInvalidoException;
 import br.ulbra.estacionamento.dominio.VeiculoJaEstacionadoException;
 import br.ulbra.estacionamento.repositorio.RegistroRepository;
+import br.ulbra.estacionamento.repositorio.RepositorioException;
 import br.ulbra.estacionamento.repositorio.RegistroRepositoryEmMemoria;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
@@ -116,5 +117,44 @@ class ServicoDeEstacionamentoTest {
         assertEquals("CARRO", registro.tipo());
         assertEquals(6.0, registro.valor(), 0.001);
         assertEquals(2, servico.vagasLivres());
+    }
+
+    @Test
+    void falhaAoGravarDeveManterVagaETicketAteUmaNovaTentativaBemSucedida() {
+        RepositorioQueFalhaAoSalvar repositorioComFalha = new RepositorioQueFalhaAoSalvar();
+        ServicoDeEstacionamento servicoComFalha =
+                new ServicoDeEstacionamento(new Estacionamento(1), repositorioComFalha);
+        servicoComFalha.registrarEntrada("ABC1D23", "CARRO", ENTRADA);
+
+        RepositorioException erro = assertThrows(RepositorioException.class,
+                () -> servicoComFalha.registrarSaida("ABC1D23", ENTRADA.plusMinutes(60)));
+
+        assertEquals("Falha simulada ao gravar.", erro.getMessage());
+        assertEquals(0, servicoComFalha.vagasLivres());
+        assertEquals(0, repositorioComFalha.listarTodos().size());
+        assertThrows(VeiculoJaEstacionadoException.class,
+                () -> servicoComFalha.registrarEntrada("ABC1D23", "CARRO", ENTRADA));
+
+        repositorioComFalha.falhar = false;
+        RegistroCobranca registro = servicoComFalha.registrarSaida("ABC1D23", ENTRADA.plusMinutes(60));
+
+        assertEquals(6.0, registro.valor(), 0.001);
+        assertEquals(1, servicoComFalha.vagasLivres());
+        assertEquals(java.util.List.of(registro), repositorioComFalha.listarTodos());
+        assertThrows(TicketNaoEncontradoException.class,
+                () -> servicoComFalha.registrarSaida("ABC1D23", ENTRADA.plusMinutes(60)));
+    }
+
+    private static class RepositorioQueFalhaAoSalvar extends RegistroRepositoryEmMemoria {
+
+        private boolean falhar = true;
+
+        @Override
+        public void salvar(RegistroCobranca registro) {
+            if (falhar) {
+                throw new RepositorioException("Falha simulada ao gravar.");
+            }
+            super.salvar(registro);
+        }
     }
 }

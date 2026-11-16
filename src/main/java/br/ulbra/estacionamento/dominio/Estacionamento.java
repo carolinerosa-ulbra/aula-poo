@@ -42,16 +42,24 @@ public class Estacionamento {
     }
 
     public double registrarSaida(Ticket ticket, LocalDateTime saida) {
-        // Validar antes de alterar: uma saída inválida mantém a vaga ocupada.
-        double valor = ticket.fechar(saida);
+        double valor = calcularValorDaSaida(ticket, saida);
+        liberarVaga(ticket);
+        return valor;
+    }
+
+    /** Calcula e valida o período sem alterar a ocupação das vagas. */
+    public double calcularValorDaSaida(Ticket ticket, LocalDateTime saida) {
+        return ticket.fechar(saida);
+    }
+
+    /** Permite que o serviço libere a vaga apenas depois de salvar a cobrança. */
+    public void liberarVaga(Ticket ticket) {
         for (Vaga vaga : vagas) {
             if (vaga.getVeiculo() == ticket.getVeiculo()) {
                 vaga.liberar();
             }
         }
-        return valor;
     }
-
     private Vaga buscarVagaLivre() {
         for (Vaga vaga : vagas) {
             if (!vaga.isOcupada()) {
