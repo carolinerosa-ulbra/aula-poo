@@ -1,8 +1,8 @@
-# Sistema de Estacionamento — Encontros 11 a 13
+# Sistema de Estacionamento — Encontro 14
 
-Projeto de demonstração da professora Caroline Pacheco da Rosa para Fundamentos de Programação Orientada a Objetos — ADS, ULBRA, 2026/2.
+Exemplo de código da professora Caroline Pacheco da Rosa para Fundamentos de Programação Orientada a Objetos — ADS, ULBRA, 2026/2.
 
-Aplicação de console para registrar a entrada de carros e motos, controlar vagas, calcular a cobrança por minuto e consultar o histórico em CSV. O projeto completo está na raiz do repositório; os alunos precisam apenas cloná-lo.
+O sistema registra entradas e saídas de carros e motos, controla vagas, calcula a cobrança por minuto e guarda o histórico em CSV. A interface é um menu de console. O projeto completo está na raiz deste repositório; os alunos não precisam dos materiais locais da professora.
 
 ## Regras de negócio
 
@@ -12,86 +12,108 @@ Aplicação de console para registrar a entrada de carros e motos, controlar vag
 | RN2 | Carro paga R$ 0,10 por minuto. |
 | RN3 | Moto paga R$ 0,06 por minuto. |
 | RN4 | A entrada ocupa uma vaga livre; sem vaga, a entrada é recusada. |
-| RN5 | A saída libera a vaga e cobra pela política definida na entrada. |
-| RN6 | A placa deve ter três letras, um dígito, uma letra ou dígito e dois dígitos, sem hífen: `ABC1D23` ou `ABC1234`. Espaços nas pontas são removidos e letras são convertidas para maiúsculas. |
-| RN7 | Uma placa com ticket aberto não pode entrar novamente. |
-| RN8 | A saída exige um ticket aberto para a placa informada. |
-| RN9 | A saída não pode ser anterior à entrada; um período inválido mantém a vaga ocupada. |
+| RN5 | A saída cobra pela política escolhida na entrada e libera a vaga após a gravação da cobrança. |
+| RN6 | A placa segue o formato `ABC1D23`: três letras, um dígito, uma letra ou dígito e dois dígitos, sem hífen. Espaços nas pontas são removidos e letras passam para maiúsculas. O padrão `ABC1234` também é aceito. |
+| RN7 | O mesmo veículo, identificado pela placa, não pode entrar duas vezes enquanto houver ticket aberto. |
+| RN8 | A saída não pode ser anterior à entrada. Saída igual à entrada é válida e custa zero. |
+| RN9 | Somente os tipos `CARRO` e `MOTO` são aceitos. Espaços nas pontas e diferenças entre maiúsculas e minúsculas são normalizados. |
 
-O tempo usa minutos completos (`ChronoUnit.MINUTES`): 60 minutos custam R$ 6,00 para carro e R$ 3,60 para moto; zero minutos custa zero. O exemplo didático mantém `double`, conforme o material da aula.
+A saída exige um ticket aberto para a placa. O tempo usa minutos completos, sem arredondar para cima: em 60 minutos, carro paga R$ 6,00 e moto paga R$ 3,60. O exemplo mantém `double` e compara os valores dos testes com margem 0.001.
 
-## Pré-requisitos e execução
+No v14, uma falha ao salvar mantém a vaga ocupada e o ticket aberto para permitir nova tentativa. A ordem do serviço é **calcular e validar → salvar → liberar vaga → remover ticket**.
 
+## Como executar em uma máquina limpa
+
+Pré-requisitos:
+
+- Git para clonar o projeto.
 - JDK **25** (LTS), conferido com `java -version`.
 - Maven **3.9.x**, conferido com `mvn -version`.
-- Acesso ao Maven Central na primeira compilação para baixar plugins e JUnit Jupiter **6.0.0**.
+- Acesso ao Maven Central na primeira compilação para baixar os plugins e o JUnit Jupiter **6.0.0**.
 
-Execute na pasta que contém `pom.xml`:
+Depois de publicar a atualização no GitHub, execute no PowerShell ou Bash:
 
 ```sh
-mvn compile
+git clone https://github.com/carolinerosa-ulbra/aula-poo.git
+cd aula-poo
 mvn test
+mvn compile
 java -cp target/classes br.ulbra.estacionamento.app.Main
 ```
 
-O menu oferece `1` para entrada, `2` para saída, `3` para histórico e total arrecadado, e `0` para encerrar. Informe o tipo `CARRO` ou `MOTO`; espaços e diferenças de maiúsculas são normalizados pelo serviço. Erros previstos mostram uma mensagem e permitem continuar usando o menu.
+O menu aceita `1` para registrar entrada, `2` para registrar saída, `3` para listar o histórico e o total e `0` para encerrar. Na entrada, informe a placa e o tipo. Na saída, informe a placa. Erros previstos mostram uma mensagem e o menu continua disponível.
 
-Exemplo com entrada simulada no PowerShell:
+Para reproduzir a execução abaixo, use uma pasta sem histórico anterior. No PowerShell:
 
 ```powershell
-"1`nABC1D23`nCARRO`n2`nABC1D23`n3`n0" | java -cp target/classes br.ulbra.estacionamento.app.Main
+"1`nABC1D23`nCARRO`n1`n123`nCARRO`n2`nZZZ9Z99`n0" | java -cp target/classes br.ulbra.estacionamento.app.Main
 ```
 
 No Bash:
 
 ```sh
-printf '1\nABC1D23\nCARRO\n2\nABC1D23\n3\n0\n' | java -cp target/classes br.ulbra.estacionamento.app.Main
+printf '1\nABC1D23\nCARRO\n1\n123\nCARRO\n2\nZZZ9Z99\n0\n' | java -cp target/classes br.ulbra.estacionamento.app.Main
 ```
 
-O `Main` cria três vagas e escolhe `RegistroRepositoryArquivo(Path.of("registros.csv"))`. O CSV é criado no diretório de execução e recebe novas linhas a cada saída. Usa `;`, datas ISO e valores com ponto decimal. O histórico sobrevive a uma nova instância; vagas e tickets abertos ficam apenas em memória durante a execução. Os testes usam repositório em memória e `@TempDir`, sem alterar o histórico da aplicação.
+`Main` cria três vagas, escolhe `RegistroRepositoryArquivo(Path.of("registros.csv"))` e monta o serviço e o menu. O CSV usa `;`, datas ISO e valor decimal com ponto. Cada saída concluída acrescenta um registro ao arquivo no diretório de execução. O histórico sobrevive a novas instâncias; vagas e tickets abertos ficam apenas na memória da execução atual.
 
-## Estrutura de pacotes
+## Estrutura de pacotes e dependências
 
-As fontes ficam em `src/main/java/br/ulbra/estacionamento`; os testes seguem os mesmos pacotes em `src/test/java`.
+As fontes estão em `src/main/java/br/ulbra/estacionamento`; os testes seguem a mesma organização em `src/test/java`.
 
-| Pacote | Classes e responsabilidade |
+| Pacote | Responsabilidade |
 |---|---|
 | `app` | `Main` monta as dependências; `MenuConsole` lê entradas, chama o serviço e apresenta resultados e erros. |
-| `servico` | `ServicoDeEstacionamento` coordena entradas, tickets por placa, saídas e persistência. |
-| `dominio` | `Veiculo`, `Carro`, `Moto`, `Vaga`, `Ticket`, `Estacionamento`, `RegistroCobranca` e exceções das regras de negócio. |
+| `servico` | `ServicoDeEstacionamento` controla os tickets por placa e coordena as operações do domínio com a gravação dos registros. |
+| `dominio` | `Veiculo`, `Carro`, `Moto`, `Vaga`, `Ticket`, `Estacionamento`, `RegistroCobranca` e as exceções de negócio. |
 | `cobranca` | `PoliticaDeCobranca`, `CobrancaCarro` e `CobrancaMoto`. |
-| `repositorio` | `RegistroRepository`, implementações em memória e arquivo, e `RepositorioException`. |
+| `repositorio` | `RegistroRepository`, implementações em memória e arquivo e `RepositorioException`. |
 
-`Vaga` e `Estacionamento` ficam no mesmo pacote: o construtor, `ocupar` e `liberar` têm acesso de pacote. O estacionamento cria suas vagas (composição) e expõe uma lista não modificável. O domínio não importa o pacote `repositorio`.
+As dependências são `app → servico → dominio`, `servico → repositorio → dominio` e `dominio → cobranca`. A apresentação também importa tipos para compor os objetos, mostrar registros e tratar erros. **O domínio não importa `repositorio`.**
 
-O polimorfismo aparece em três pontos comentados: **decisão** em `Estacionamento.escolherPolitica`, **armazenamento** da referência à interface no `Ticket` e **execução** em `Ticket.fechar`. A política é escolhida antes de ocupar a vaga; o ticket é validado antes de liberar a vaga.
+`Vaga` e `Estacionamento` permanecem no mesmo pacote para usar o construtor e os métodos de alteração com acesso de pacote. A coleção de vagas é não modificável para quem a consulta.
 
-Veja os [diagramas de classes e dependências em Mermaid](docs/diagrama-classes/README.md).
+O polimorfismo tem três pontos comentados no código: decisão em `Estacionamento.escolherPolitica`, armazenamento da referência à interface no `Ticket` e execução em `Ticket.fechar`. `Carro.TIPO` e `Moto.TIPO` concentram os nomes dos tipos; `Veiculo.normalizarPlaca` e `Veiculo.normalizarTipo` concentram sua normalização.
 
-## Erros e tratamento no v13
+Confira os [diagramas de classes e dependências em Mermaid](docs/diagrama-classes/README.md), atualizados com as 24 classes, interfaces, record e exceções de produção.
 
-As seis exceções de negócio abaixo herdam de `EstacionamentoException`, que estende `RuntimeException`. `RepositorioException` também é não verificada, mas representa um erro técnico e preserva a causa quando envolve outra exceção.
+## Erros e tratamento
 
-| Situação | Exceção | Camada que lança | Camada que trata | Mensagem |
+| Situação | Exceção | Camada que lança | Camada que trata | Mensagem ao usuário |
 |---|---|---|---|---|
-| Placa nula ou fora do formato | `PlacaInvalidaException` | Domínio (`Veiculo`) | Apresentação (`MenuConsole`) | `Placa inválida: "<placa>". Use o formato ABC1D23.` |
-| Tipo diferente de carro ou moto | `TipoDeVeiculoInvalidoException` | Serviço (criação do veículo) ou domínio (escolha da política) | Apresentação | `Tipo de veículo não aceito: "<tipo>". Use CARRO ou MOTO.` |
-| Nenhuma vaga livre | `EstacionamentoLotadoException` | Domínio (`Estacionamento`) | Apresentação | `Não há vaga livre no momento.` |
-| Saída sem ticket aberto | `TicketNaoEncontradoException` | Serviço | Apresentação | `Não há ticket aberto para a placa <placa>.` |
-| Nova entrada da mesma placa | `VeiculoJaEstacionadoException` | Serviço | Apresentação | `O veículo de placa <placa> já está estacionado.` |
-| Saída anterior à entrada | `PeriodoInvalidoException` | Domínio (`Ticket`) | Apresentação | `A saída não pode ser anterior à entrada.` |
-| Falha ao gravar ou ler o arquivo | `RepositorioException` | Repositório | Apresentação | Interna: `Não foi possível gravar o registro em <arquivo>` ou `Não foi possível ler os registros de <arquivo>`. Na tela: `Falha ao acessar os registros. Tente novamente.` |
-| Linha corrompida no CSV | `RepositorioException` | Repositório | Apresentação | Interna: `Linha inválida no arquivo: <linha>`. Na tela: `Falha ao acessar os registros. Tente novamente.` |
+| Contrato comum das violações de negócio | `EstacionamentoException` | Domínio ou serviço, por meio das subclasses; a base não é lançada diretamente | Apresentação (`MenuConsole`) | `Erro: <mensagem da subclasse>` |
+| Placa nula ou fora do formato | `PlacaInvalidaException` | Domínio (`Veiculo`) | Apresentação | `Erro: Placa inválida: "<placa>". Use o formato ABC1D23.` |
+| Tipo diferente de carro ou moto | `TipoDeVeiculoInvalidoException` | Serviço (criação do veículo) ou domínio (escolha da política) | Apresentação | `Erro: Tipo de veículo não aceito: "<tipo>". Use CARRO ou MOTO.` |
+| Nenhuma vaga livre | `EstacionamentoLotadoException` | Domínio (`Estacionamento`) | Apresentação | `Erro: Não há vaga livre no momento.` |
+| Saída sem ticket aberto | `TicketNaoEncontradoException` | Serviço | Apresentação | `Erro: Não há ticket aberto para a placa <placa>.` |
+| Nova entrada da mesma placa | `VeiculoJaEstacionadoException` | Serviço | Apresentação | `Erro: O veículo de placa <placa> já está estacionado.` |
+| Saída anterior à entrada | `PeriodoInvalidoException` | Domínio (`Ticket`) | Apresentação | `Erro: A saída não pode ser anterior à entrada.` |
+| Falha de leitura, gravação ou linha inválida no CSV | `RepositorioException` | Repositório | Apresentação | `Falha ao acessar os registros. Tente novamente.` |
 
-O menu acrescenta `Erro: ` às mensagens de negócio. O `try/catch` fica dentro do laço, permitindo uma nova operação. Uma opção de menu desconhecida é tratada na apresentação com `Opção inválida: "<opcao>". Digite 0, 1, 2 ou 3.`, sem lançar exceção de negócio.
+As exceções de negócio são não verificadas e herdam de `EstacionamentoException`. O erro técnico `RepositorioException` tem hierarquia separada e preserva a causa quando ela existe. O `try/catch` fica dentro do laço do menu. A opção desconhecida é tratada diretamente na apresentação: `Opção inválida: "<opcao>". Digite 0, 1, 2 ou 3.`
+
+## Decisões de projeto
+
+| Contexto | Decisão | Consequência |
+|---|---|---|
+| Cobranças variam conforme o tipo | Interface `PoliticaDeCobranca`; o ticket recebe a política no construtor | O ticket executa a cobrança sem selecionar o tipo novamente |
+| Ocupação precisa permanecer sob controle | Composição de `Vaga` em `Estacionamento`, acesso de pacote e lista não modificável | A consulta não permite remover ou substituir vagas |
+| Persistência não é regra de domínio | O serviço usa `RegistroRepository`; o record fica no domínio | Memória e CSV usam o mesmo contrato; domínio não importa repositório |
+| Erros de negócio e técnicos precisam de mensagens diferentes | Exceções não verificadas, base comum de negócio e exceção técnica separada | O menu trata os erros previstos e continua recebendo operações |
+| Falhas não devem deixar uma saída pela metade | Validar e salvar antes de liberar a vaga e remover o ticket | Uma falha de gravação permite nova tentativa com a vaga ainda ocupada |
+| Entrada e saída precisam da mesma chave | Métodos explícitos de normalização de placa e tipo | Preserva os formatos, os resultados para `null` e as mensagens |
+| Tipos repetidos podem divergir | Constantes `Carro.TIPO` e `Moto.TIPO`, sem enum | Os literais têm uma definição; `getTipo()` e CSV continuam com `String` |
+
+Os mesmos registros estão detalhados em [docs/decisoes.md](docs/decisoes.md), no formato Contexto → Decisão → Consequência.
 
 ## Como o código evolui
 
 | Tag | Encontro | Evolução |
 |---|---|---|
-| `v11` | 11 — Reciclagem | Pacote único `br.ulbra.estacionamento`, herança, interface, polimorfismo, composição e 10 testes. `Main` simula carro e moto por 60 minutos, total R$ 9,60. |
-| `v12` | 12 — Pacotes e repositório | Separação em `dominio`, `cobranca`, `repositorio` e `app`. `RegistroCobranca` fica em `repositorio`; `Estacionamento(int, RegistroRepository)` salva as saídas. Falhas de arquivo usam `UncheckedIOException`. São 15 testes. |
-| `v13` | 13 — Exceções e camadas | Exceções próprias, validações antes de alterar o estado, `RegistroCobranca` no domínio e persistência coordenada pelo serviço. Menu com entrada, saída e relógio injetados; `Main` é a raiz de composição. São 27 testes da referência e 2 testes de memória preservados do v12. |
+| `v11` | 11 — Reciclagem | Pacote único, herança, interface, polimorfismo, composição e 10 testes. O exemplo de carro e moto por 60 minutos soma R$ 9,60. |
+| `v12` | 12 — Pacotes e repositório | Pacotes por responsabilidade, record no repositório e persistência por memória ou CSV. O estacionamento ainda usa o repositório. São 15 testes. |
+| `v13` | 13 — Exceções e camadas | Exceções próprias, serviço, menu e raiz de composição. O record vai para o domínio e o serviço usa o repositório. São 29 testes: 27 da referência e dois de memória preservados. |
+| `v14` | 14 — Testes, refatoração e documentação | Cobrança parametrizada e casos-limite, normalização centralizada, constantes de tipo e saída consistente após falha de gravação. Documentação e diagramas atualizados. São 44 testes. |
 
 Com o trabalho local salvo, navegue pelas aulas:
 
@@ -102,12 +124,52 @@ java -cp target/classes br.ulbra.estacionamento.app.Main
 git checkout main
 ```
 
-As tags abrem uma versão de estudo em estado destacado (*detached HEAD*). No v11, execute `br.ulbra.estacionamento.Main`. Use `mvn clean test` ao trocar de versão para remover classes compiladas de pacotes antigos.
+As tags abrem uma versão de estudo em estado destacado (*detached HEAD*). No v11, o nome executável é `br.ulbra.estacionamento.Main`. Ao trocar de versão, use `mvn clean test` para remover classes compiladas de pacotes antigos. As tags v11, v12 e v13 foram preservadas; a tag v14 identifica o estado do Encontro 14. A publicação está registrada no relatório do encontro.
 
-A branch `atualizacao-aulas-11-a-13` contém a atualização para revisão; `main` permanece no estado anterior até a professora integrar o trabalho. Para voltar à atualização, use `git checkout atualizacao-aulas-11-a-13`.
+## Saídas reais da verificação
+
+O passo a passo foi executado em um clone novo do repositório local, com JDK 25.0.4 e Maven 3.9.16. O cache Maven foi redirecionado apenas no ambiente de execução para uma pasta temporária; isso não altera o POM nem acrescenta arquivos ao projeto.
+
+Trecho final copiado da execução de `mvn test`:
+
+```text
+[INFO] Results:
+[INFO]
+[INFO] Tests run: 44, Failures: 0, Errors: 0, Skipped: 0
+[INFO]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  13.865 s
+[INFO] Finished at: 2026-11-16T14:02:36-03:00
+[INFO] ------------------------------------------------------------------------
+```
+
+Saída copiada da execução do menu com o pipe mostrado acima:
+
+```text
+1 - Registrar entrada | 2 - Registrar saída | 3 - Listar registros | 0 - Sair
+Opção: Placa: Tipo (CARRO ou MOTO): Entrada registrada. Vagas livres: 2
+
+1 - Registrar entrada | 2 - Registrar saída | 3 - Listar registros | 0 - Sair
+Opção: Placa: Tipo (CARRO ou MOTO): Erro: Placa inválida: "123". Use o formato ABC1D23.
+
+1 - Registrar entrada | 2 - Registrar saída | 3 - Listar registros | 0 - Sair
+Opção: Placa: Erro: Não há ticket aberto para a placa ZZZ9Z99.
+
+1 - Registrar entrada | 2 - Registrar saída | 3 - Listar registros | 0 - Sair
+Opção: Encerrado.
+```
+
+Os testes usam horários fixos e diretórios `@TempDir`. A sequência da saída com falha de gravação é verificada com um repositório falso, incluindo a nova tentativa. O [registro de melhorias](docs/melhorias.md) apresenta os casos adicionados e a falha observada antes da correção.
 
 ## Documentação e uso de IA
 
-O [relatório da atualização](docs/relatorio-atualizacao.md) registra o diagnóstico, as validações e as decisões sobre o modelo anterior. [Planejamento](docs/planejamento.md) e [backlog](docs/backlog.md) preservam o contexto do semestre.
+- [Decisões de projeto](docs/decisoes.md).
+- [Melhorias do Encontro 14](docs/melhorias.md).
+- [Relatório do Encontro 14](docs/relatorio-encontro14.md), com commits, testes e publicação.
+- [Notas da release v14](docs/notas-v14.md).
+- [Relatório dos encontros 11 a 13](docs/relatorio-atualizacao.md), preservado como registro histórico.
+- [Planejamento](docs/planejamento.md), [backlog](docs/backlog.md) e [registro anterior de IA](docs/IA.md).
 
-Codex foi usado para organizar a evolução dos encontros 11 a 13, adaptar os materiais fornecidos, atualizar a documentação e executar as verificações. A definição do domínio e dos materiais de referência é da professora. O histórico anterior de uso de IA permanece em [docs/IA.md](docs/IA.md).
+Codex foi usado para ampliar os testes, executar as refatorações e a correção solicitadas e atualizar a documentação. A professora definiu o domínio, os materiais de referência e os requisitos dos encontros. O POM continua com Java 25, JUnit Jupiter 6.0.0 e Surefire 3.5.4, sem novas dependências.
