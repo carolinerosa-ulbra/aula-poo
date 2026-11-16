@@ -67,4 +67,23 @@ class EstacionamentoTest {
         assertThrows(UnsupportedOperationException.class,
                 () -> estacionamento.getVagas().clear());
     }
+
+    @Test
+    void ultimaVagaDeveAceitarEntradaEVoltarAFicarDisponivelAposUmaSaida() {
+        Ticket primeiro = estacionamento.registrarEntrada(new Carro("AAA1A11"), ENTRADA);
+        Ticket ultimo = estacionamento.registrarEntrada(new Moto("BBB2B22"), ENTRADA);
+
+        assertEquals("BBB2B22", ultimo.getVeiculo().getPlaca());
+        assertEquals(0, estacionamento.vagasLivres());
+        assertThrows(EstacionamentoLotadoException.class,
+                () -> estacionamento.registrarEntrada(new Carro("CCC3C33"), ENTRADA));
+
+        assertEquals(6.0, estacionamento.registrarSaida(primeiro, ENTRADA.plusMinutes(60)), 0.001);
+        assertEquals(1, estacionamento.vagasLivres());
+
+        Ticket novaEntrada = estacionamento.registrarEntrada(new Carro("CCC3C33"), ENTRADA.plusMinutes(60));
+
+        assertEquals("CCC3C33", novaEntrada.getVeiculo().getPlaca());
+        assertEquals(0, estacionamento.vagasLivres());
+    }
 }

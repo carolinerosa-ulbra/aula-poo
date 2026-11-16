@@ -26,4 +26,20 @@ class VeiculoTest {
     void deveRecusarPlacaNula() {
         assertThrows(PlacaInvalidaException.class, () -> new Moto(null));
     }
+
+    @Test
+    void placaComSeisCaracteresDeveSerRecusada() {
+        PlacaInvalidaException erro = assertThrows(PlacaInvalidaException.class,
+                () -> new Carro("ABC1D2"));
+
+        assertEquals("Placa inválida: \"ABC1D2\". Use o formato ABC1D23.", erro.getMessage());
+    }
+
+    @Test
+    void placaComOitoCaracteresDeveSerRecusada() {
+        PlacaInvalidaException erro = assertThrows(PlacaInvalidaException.class,
+                () -> new Moto("ABC1D234"));
+
+        assertEquals("Placa inválida: \"ABC1D234\". Use o formato ABC1D23.", erro.getMessage());
+    }
 }

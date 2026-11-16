@@ -78,4 +78,43 @@ class ServicoDeEstacionamentoTest {
                 () -> servico.registrarEntrada("???", "CARRO", ENTRADA));
         assertEquals(2, servico.vagasLivres());
     }
+
+    @Test
+    void saidaComPlacaNulaDeveContinuarSendoTicketNaoEncontrado() {
+        TicketNaoEncontradoException erro = assertThrows(TicketNaoEncontradoException.class,
+                () -> servico.registrarSaida(null, ENTRADA));
+
+        assertEquals("Não há ticket aberto para a placa null.", erro.getMessage());
+        assertEquals(2, servico.vagasLivres());
+    }
+
+    @Test
+    void entradaComPlacaNulaDeveContinuarSendoPlacaInvalida() {
+        PlacaInvalidaException erro = assertThrows(PlacaInvalidaException.class,
+                () -> servico.registrarEntrada(null, "CARRO", ENTRADA));
+
+        assertEquals("Placa inválida: \"null\". Use o formato ABC1D23.", erro.getMessage());
+        assertEquals(2, servico.vagasLivres());
+    }
+
+    @Test
+    void entradaComTipoNuloDevePreservarAMensagemESuasVagas() {
+        TipoDeVeiculoInvalidoException erro = assertThrows(TipoDeVeiculoInvalidoException.class,
+                () -> servico.registrarEntrada("ABC1D23", null, ENTRADA));
+
+        assertEquals("Tipo de veículo não aceito: \"null\". Use CARRO ou MOTO.", erro.getMessage());
+        assertEquals(2, servico.vagasLivres());
+    }
+
+    @Test
+    void entradaESaidaDevemNormalizarEspacosEMaiusculasDaPlacaEDoTipo() {
+        servico.registrarEntrada(" abc1d23 ", " carro ", ENTRADA);
+
+        RegistroCobranca registro = servico.registrarSaida(" aBc1d23 ", ENTRADA.plusMinutes(60));
+
+        assertEquals("ABC1D23", registro.placa());
+        assertEquals("CARRO", registro.tipo());
+        assertEquals(6.0, registro.valor(), 0.001);
+        assertEquals(2, servico.vagasLivres());
+    }
 }

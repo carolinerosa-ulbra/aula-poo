@@ -32,4 +32,13 @@ class TicketTest {
 
         assertThrows(PeriodoInvalidoException.class, () -> ticket.fechar(ENTRADA.minusMinutes(1)));
     }
+
+    @Test
+    void saidaIgualAEntradaDeveCobrarZeroSemLancarExcecao() {
+        Ticket ticket = new Ticket(new Carro("ABC1D23"), new CobrancaCarro(), ENTRADA);
+
+        double valor = org.junit.jupiter.api.Assertions.assertDoesNotThrow(() -> ticket.fechar(ENTRADA));
+
+        assertEquals(0.0, valor, 0.001);
+    }
 }
