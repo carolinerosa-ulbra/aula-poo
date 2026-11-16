@@ -10,13 +10,22 @@ public abstract class Veiculo {
         if (placa == null) {
             throw new PlacaInvalidaException(null);
         }
-        String normalizada = placa.trim().toUpperCase();
+        String normalizada = normalizarPlaca(placa);
         if (!normalizada.matches(FORMATO_PLACA)) {
             throw new PlacaInvalidaException(placa);
         }
         this.placa = normalizada;
     }
 
+    /** Mantém a mesma chave de placa na entrada e na busca do ticket na saída. */
+    public static String normalizarPlaca(String placa) {
+        return placa == null ? "" : placa.trim().toUpperCase();
+    }
+
+    /** Padroniza o tipo antes de escolher o veículo, sem esconder o valor original do erro. */
+    public static String normalizarTipo(String tipo) {
+        return tipo == null ? "" : tipo.trim().toUpperCase();
+    }
     public String getPlaca() {
         return placa;
     }

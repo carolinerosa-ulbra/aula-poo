@@ -38,7 +38,7 @@ public class ServicoDeEstacionamento {
     }
 
     public RegistroCobranca registrarSaida(String placa, LocalDateTime saida) {
-        String chave = placa == null ? "" : placa.trim().toUpperCase();
+        String chave = Veiculo.normalizarPlaca(placa);
         Ticket ticket = ticketsAbertos.get(chave);
         if (ticket == null) {
             throw new TicketNaoEncontradoException(placa);
@@ -68,7 +68,7 @@ public class ServicoDeEstacionamento {
     }
 
     private Veiculo criarVeiculo(String placa, String tipo) {
-        String tipoNormalizado = tipo == null ? "" : tipo.trim().toUpperCase();
+        String tipoNormalizado = Veiculo.normalizarTipo(tipo);
         return switch (tipoNormalizado) {
             case "CARRO" -> new Carro(placa);
             case "MOTO" -> new Moto(placa);
