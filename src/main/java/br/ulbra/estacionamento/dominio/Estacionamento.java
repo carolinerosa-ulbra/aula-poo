@@ -12,17 +12,19 @@ public class Estacionamento {
 
     private final List<Vaga> vagas = new ArrayList<>();
 
-    // Composição: o estacionamento cria e controla suas vagas.
+    /** Cria as próprias vagas para controlar sua ocupação por composição. */
     public Estacionamento(int quantidadeDeVagas) {
         for (int numero = 1; numero <= quantidadeDeVagas; numero++) {
             vagas.add(new Vaga(numero));
         }
     }
 
+    /** Permite consultar sem remover ou substituir as vagas criadas pelo estacionamento. */
     public List<Vaga> getVagas() {
         return Collections.unmodifiableList(vagas);
     }
 
+    /** Centraliza a consulta de ocupação para que a apresentação não inspecione as vagas. */
     public int vagasLivres() {
         int livres = 0;
         for (Vaga vaga : vagas) {
@@ -33,6 +35,7 @@ public class Estacionamento {
         return livres;
     }
 
+    /** Valida a política antes de ocupar a vaga, evitando uma entrada parcialmente registrada. */
     public Ticket registrarEntrada(Veiculo veiculo, LocalDateTime entrada) {
         Vaga vaga = buscarVagaLivre();
         // Validar antes de alterar: um tipo sem política não pode ocupar a vaga.
@@ -41,6 +44,7 @@ public class Estacionamento {
         return new Ticket(veiculo, politica, entrada);
     }
 
+    /** Mantém a saída direta do domínio, validando o período antes de liberar a vaga. */
     public double registrarSaida(Ticket ticket, LocalDateTime saida) {
         double valor = calcularValorDaSaida(ticket, saida);
         liberarVaga(ticket);

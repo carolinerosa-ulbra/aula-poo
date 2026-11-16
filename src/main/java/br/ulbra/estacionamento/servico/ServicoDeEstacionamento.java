@@ -22,11 +22,13 @@ public class ServicoDeEstacionamento {
     private final RegistroRepository repositorio;
     private final Map<String, Ticket> ticketsAbertos = new HashMap<>();
 
+    /** Recebe as dependências para trocar o armazenamento sem alterar as regras de domínio. */
     public ServicoDeEstacionamento(Estacionamento estacionamento, RegistroRepository repositorio) {
         this.estacionamento = estacionamento;
         this.repositorio = repositorio;
     }
 
+    /** Recusa duplicidade antes de ocupar a vaga e só guarda o ticket após uma entrada válida. */
     public Ticket registrarEntrada(String placa, String tipo, LocalDateTime entrada) {
         Veiculo veiculo = criarVeiculo(placa, tipo);
         if (ticketsAbertos.containsKey(veiculo.getPlaca())) {
@@ -37,6 +39,7 @@ public class ServicoDeEstacionamento {
         return ticket;
     }
 
+    /** Valida e grava antes de liberar a vaga, preservando o ticket se o repositório falhar. */
     public RegistroCobranca registrarSaida(String placa, LocalDateTime saida) {
         String chave = Veiculo.normalizarPlaca(placa);
         Ticket ticket = ticketsAbertos.get(chave);
@@ -52,10 +55,12 @@ public class ServicoDeEstacionamento {
         return registro;
     }
 
+    /** Consulta o contrato de armazenamento para não depender de memória ou arquivo. */
     public List<RegistroCobranca> listarRegistros() {
         return repositorio.listarTodos();
     }
 
+    /** Usa os mesmos registros do histórico para manter uma única fonte para o total. */
     public double totalArrecadado() {
         double total = 0;
         for (RegistroCobranca registro : repositorio.listarTodos()) {
@@ -64,6 +69,7 @@ public class ServicoDeEstacionamento {
         return total;
     }
 
+    /** Delega ao domínio para que a apresentação não conheça a coleção de vagas. */
     public int vagasLivres() {
         return estacionamento.vagasLivres();
     }
