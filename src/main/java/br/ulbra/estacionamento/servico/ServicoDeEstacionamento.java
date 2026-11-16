@@ -70,8 +70,8 @@ public class ServicoDeEstacionamento {
     private Veiculo criarVeiculo(String placa, String tipo) {
         String tipoNormalizado = Veiculo.normalizarTipo(tipo);
         return switch (tipoNormalizado) {
-            case "CARRO" -> new Carro(placa);
-            case "MOTO" -> new Moto(placa);
+            case Carro.TIPO -> new Carro(placa);
+            case Moto.TIPO -> new Moto(placa);
             default -> throw new TipoDeVeiculoInvalidoException(tipo);
         };
     }

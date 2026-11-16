@@ -64,8 +64,8 @@ public class Estacionamento {
     // Único ponto que escolhe a política pelo tipo do veículo.
     private PoliticaDeCobranca escolherPolitica(Veiculo veiculo) {
         return switch (veiculo.getTipo()) {
-            case "CARRO" -> new CobrancaCarro();
-            case "MOTO" -> new CobrancaMoto();
+            case Carro.TIPO -> new CobrancaCarro();
+            case Moto.TIPO -> new CobrancaMoto();
             default -> throw new TipoDeVeiculoInvalidoException(veiculo.getTipo());
         };
     }

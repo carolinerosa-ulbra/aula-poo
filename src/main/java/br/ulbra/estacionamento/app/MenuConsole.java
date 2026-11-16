@@ -1,5 +1,7 @@
 package br.ulbra.estacionamento.app;
 
+import br.ulbra.estacionamento.dominio.Carro;
+import br.ulbra.estacionamento.dominio.Moto;
 import br.ulbra.estacionamento.dominio.EstacionamentoException;
 import br.ulbra.estacionamento.dominio.RegistroCobranca;
 import br.ulbra.estacionamento.repositorio.RepositorioException;
@@ -57,7 +59,7 @@ public class MenuConsole {
     private void registrarEntrada() {
         saida.print("Placa: ");
         String placa = entrada.nextLine();
-        saida.print("Tipo (CARRO ou MOTO): ");
+        saida.print("Tipo (" + Carro.TIPO + " ou " + Moto.TIPO + "): ");
         String tipo = entrada.nextLine();
         servico.registrarEntrada(placa, tipo, relogio.get());
         saida.println("Entrada registrada. Vagas livres: " + servico.vagasLivres());
